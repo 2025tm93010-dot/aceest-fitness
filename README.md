@@ -79,5 +79,5 @@ git add Dockerfile .dockerignore && git commit -m "build: add multi-stage Docker
 git add .github && git commit -m "ci: add GitHub Actions workflow"
 git add Jenkinsfile && git commit -m "ci: add Jenkins pipeline"
 git add README.md .gitignore && git commit -m "docs: add README"
-git remote add origin https://github.com/<you>/aceest-fitness.git && git push -u origin main
+git remote add origin https://github.com/2025tm93010-dot/aceest-fitness.git && git push -u origin main
 ```
