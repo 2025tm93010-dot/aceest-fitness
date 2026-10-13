@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Lint (flake8)
+        run: flake8 .
+
+      - name: Syntax check
+        run: python -m compileall -q app.py tests
+
+      - name: Build Docker image (runtime)
+        run: docker build --target runtime -t aceest-fitness:${{ github.sha }} .
+
+      - name: Build test image
+        run: docker build --target test -t aceest-fitness-test:${{ github.sha }} .
+
+      - name: Run Pytest inside container
+        run: docker run --rm aceest-fitness-test:${{ github.sha }}
