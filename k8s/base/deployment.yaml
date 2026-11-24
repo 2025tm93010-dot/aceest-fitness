@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aceest-fitness
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels: {app: aceest-fitness}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: {maxSurge: 1, maxUnavailable: 0}
+  template:
+    metadata:
+      labels: {app: aceest-fitness, track: stable}
+    spec:
+      containers:
+      - name: app
+        image: DOCKERHUB_USERNAME/aceest-fitness:latest
+        imagePullPolicy: Always
+        ports: [{containerPort: 5000}]
+        readinessProbe:
+          httpGet: {path: /health, port: 5000}
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        livenessProbe:
+          httpGet: {path: /health, port: 5000}
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        resources:
+          requests: {cpu: 100m, memory: 128Mi}
+          limits: {cpu: 500m, memory: 512Mi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aceest-fitness
+spec:
+  type: NodePort
+  selector: {app: aceest-fitness, track: stable}
+  ports:
+  - port: 5000
+    targetPort: 5000
+    nodePort: 30080
